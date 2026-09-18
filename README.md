@@ -5,7 +5,27 @@
 A local AI model recommender built in Rust, part of
 [Wiracocha Labs](https://github.com/wiracocha-labs).
 
-**Status:** Planned
+**Status:** Phase 1 — MVP CLI `In progress`
+
+---
+
+## Quickstart
+
+```bash
+cargo build
+
+# Recomendación directa para una tarea
+cargo run -p yachay-cli -- recommend --task code
+
+# Con explicación de por qué ganó y qué se descartó
+cargo run -p yachay-cli -- recommend --task code --explain
+
+# Wizard interactivo (sin args)
+cargo run -p yachay-cli
+
+# Ver la base curada y qué cabe en tu hardware
+cargo run -p yachay-cli -- models
+```
 
 ---
 

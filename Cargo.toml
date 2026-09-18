@@ -1,0 +1,13 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/yachay-core",
+    "crates/yachay-cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "AGPL-3.0"
+authors = ["Wiracocha Labs"]
+repository = "https://github.com/wiracocha-labs/yachay"

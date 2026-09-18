@@ -1,0 +1,19 @@
+[package]
+name = "yachay-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "CLI de yachay: recomendador de modelos de IA locales según tu hardware y tu tarea"
+
+[[bin]]
+name = "yachay"
+path = "src/main.rs"
+
+[dependencies]
+yachay-core = { path = "../yachay-core" }
+clap = { version = "4", features = ["derive"] }
+inquire = "0.7"
+console = "0.15"
+anyhow = "1"
