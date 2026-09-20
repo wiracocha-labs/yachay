@@ -11,3 +11,24 @@ edition = "2021"
 license = "AGPL-3.0"
 authors = ["Wiracocha Labs"]
 repository = "https://github.com/wiracocha-labs/yachay"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
+
+# Configuración de dist (cargo-dist): releases multiplataforma para que
+# nadie necesite Rust instalado — binarios + instaladores shell/powershell.
+[workspace.metadata.dist]
+cargo-dist-version = "0.33.0"
+ci = ["github"]
+installers = ["shell", "powershell"]
+targets = [
+    "aarch64-apple-darwin",
+    "x86_64-apple-darwin",
+    "x86_64-unknown-linux-gnu",
+    "aarch64-unknown-linux-gnu",
+    "x86_64-pc-windows-msvc",
+]
+pr-run-mode = "skip"
+install-path = "CARGO_HOME"
