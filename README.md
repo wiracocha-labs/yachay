@@ -5,26 +5,51 @@
 A local AI model recommender built in Rust, part of
 [Wiracocha Labs](https://github.com/wiracocha-labs).
 
-**Status:** Phase 1 — MVP CLI `In progress`
+**Status:** Phase 1 — MVP CLI `Released` · [v0.1.0](https://github.com/wiracocha-labs/yachay/releases/tag/v0.1.0)
 
 ---
+
+## Install (no Rust required)
+
+Pre-compiled binaries for macOS (Apple Silicon + Intel), Linux (x86 + ARM)
+and Windows are published on
+[GitHub Releases](https://github.com/wiracocha-labs/yachay/releases/latest).
+
+**macOS / Linux:**
+
+```bash
+curl --proto '=https' --tlsv1.2 -LsSf \
+  https://github.com/wiracocha-labs/yachay/releases/latest/download/yachay-cli-installer.sh | sh
+```
+
+**Windows (PowerShell):**
+
+```powershell
+powershell -ExecutionPolicy Bypass -c "irm https://github.com/wiracocha-labs/yachay/releases/latest/download/yachay-cli-installer.ps1 | iex"
+```
+
+Or download the archive for your platform directly from the release page.
 
 ## Quickstart
 
 ```bash
-cargo build
-
 # Recomendación directa para una tarea
-cargo run -p yachay-cli -- recommend --task code
+yachay recommend --task code
 
 # Con explicación de por qué ganó y qué se descartó
-cargo run -p yachay-cli -- recommend --task code --explain
+yachay recommend --task code --explain
 
 # Wizard interactivo (sin args)
-cargo run -p yachay-cli
+yachay
 
 # Ver la base curada y qué cabe en tu hardware
-cargo run -p yachay-cli -- models
+yachay models
+```
+
+To build from source instead:
+
+```bash
+cargo install --git https://github.com/wiracocha-labs/yachay yachay-cli
 ```
 
 ---
@@ -103,13 +128,13 @@ CLI version.
 
 No dates — verifiable milestones.
 
-### Phase 0 — Scope definition `In progress`
+### Phase 0 — Scope definition `Done`
 - Define recommendation logic and hardware detection approach.
 - Curate initial model database (10-15 models with verified requirements).
 
 **Exit criterion:** this README reviewed and confirmed accurate.
 
-### Phase 1 — MVP CLI `Planned`
+### Phase 1 — MVP CLI `Done` (v0.1.0)
 - Hardware detection working on Linux and macOS.
 - Recommendation logic for RAM + task type (core constraints).
 - Initial curated model database.
