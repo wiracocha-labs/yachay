@@ -91,20 +91,19 @@ CLI version.
 ## Scope
 
 ### In scope (MVP)
-- CLI in Rust that detects available hardware (RAM, CPU cores, presence of
-  GPU/VRAM, disk type — NVMe vs SATA vs HDD)
+- CLI in Rust that detects available hardware (RAM total and usable, CPU
+  cores, CPU brand, OS/arch). GPU/VRAM and disk type detection are Phase 2.
 - Curated database of open-source models with verified hardware requirements
-  (Llama 3.2, Qwen, Phi-3-mini, Gemma, Mistral, and others)
+  (Llama 3.2, Qwen, Phi-3-mini, Gemma, Mistral, and others — 15 models today)
 - Recommendation logic based on:
-  - Available RAM (hard constraint — model must fit)
-  - Task type (text/code, summarization, RAG, image — selects specialized
+  - Available usable RAM (hard constraint — model must fit)
+  - Task type (code, chat, summarization, RAG — selects specialized
     models over general ones)
-  - Disk type (NVMe enables MoE expert streaming for larger models)
-  - Single user vs. multi-user (affects latency tolerance)
-- Output: exact model name + download command (Ollama or direct GGUF link)
-  + estimated tokens/second on detected hardware
+- Output: exact model name + `ollama run` command
+  + rough estimated tokens/second (heuristic based on CPU architecture and
+  model size, not a measurement on your machine)
 - Optional flag: `--explain` prints why this model was recommended over
-  alternatives
+  alternatives (implemented in v0.1.0)
 
 ### Out of scope (for now)
 - GUI or web interface
@@ -137,8 +136,9 @@ No dates — verifiable milestones.
 ### Phase 1 — MVP CLI `Done` (v0.1.0)
 - Hardware detection working on Linux and macOS.
 - Recommendation logic for RAM + task type (core constraints).
-- Initial curated model database.
+- Initial curated model database (15 models).
 - `yachay recommend` command returns a usable result.
+- `--explain` flag with reasoning output.
 
 **Exit criterion:** someone on a 5-year-old laptop with 16GB RAM runs
 `yachay recommend --task code` and gets a correct, installable recommendation
@@ -147,9 +147,9 @@ without reading any documentation.
 ### Phase 2 — Expanded coverage `Planned`
 - Disk type detection (NVMe vs SATA) enabling MoE streaming recommendations.
 - GPU/VRAM detection for machines with a dedicated GPU.
-- `--explain` flag with reasoning output.
 - Model database expanded to 30+ models.
-- Windows support.
+- Windows: binary published with v0.1.0, but hardware detection not yet
+  validated on real Windows machines.
 
 **Exit criterion:** Yachay recommends correctly across at least 10 different
 real hardware configurations, verified by external testers.
