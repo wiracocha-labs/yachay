@@ -25,11 +25,17 @@ const BASE_TPS_PER_BILLION: f64 = 75.0;
 #[derive(Debug, Clone)]
 pub enum CandidateVerdict {
     /// Cabe y sirve para la tarea — quedó rankeado.
-    Fits { score: f64 },
+    Fits {
+        /// Capacidad del modelo más el bonus de especialización.
+        score: f64,
+    },
     /// Cabe pero no está especializado en la tarea (queda como fallback).
     FitsOtherTask,
     /// No cabe en la RAM usable.
-    TooBig { deficit_gb: f64 },
+    TooBig {
+        /// Cuántos GB le faltan para entrar.
+        deficit_gb: f64,
+    },
 }
 
 /// Resultado completo de una recomendación.

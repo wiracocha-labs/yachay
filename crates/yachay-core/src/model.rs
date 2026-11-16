@@ -23,6 +23,7 @@ pub enum Task {
 }
 
 impl Task {
+    /// Todas las tareas, en el orden en que se muestran en el wizard.
     pub const ALL: [Task; 4] = [Task::Code, Task::Chat, Task::Summarize, Task::Rag];
 
     /// Nombre para mostrar en la UI.

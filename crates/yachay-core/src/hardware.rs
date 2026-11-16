@@ -11,9 +11,13 @@ const OS_RAM_HEADROOM: f64 = 0.70;
 /// La detección fiable por plataforma queda pendiente; por ahora Unknown.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DiskKind {
+    /// SSD NVMe — rápido, requisito del expert streaming de Fase 2.
     Nvme,
+    /// SSD SATA.
     Sata,
+    /// Disco mecánico — demasiado lento para streaming de pesos.
     Hdd,
+    /// No detectable todavía en esta plataforma.
     Unknown,
 }
 
@@ -24,7 +28,9 @@ pub struct HardwareProfile {
     pub os: String,
     /// Ej. "aarch64", "x86_64"
     pub arch: String,
+    /// Nombre comercial del CPU, ej. "Apple M2".
     pub cpu_brand: String,
+    /// Núcleos físicos (no hilos).
     pub cpu_cores: usize,
     /// RAM total instalada en GB.
     pub total_ram_gb: f64,
@@ -32,6 +38,7 @@ pub struct HardwareProfile {
     pub usable_ram_gb: f64,
     /// VRAM dedicada — None en MVP (Fase 2: detección real de GPU).
     pub gpu_vram_gb: Option<f64>,
+    /// Tipo de disco detectado — afecta si el streaming de pesos es viable.
     pub disk: DiskKind,
 }
 

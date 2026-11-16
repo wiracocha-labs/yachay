@@ -104,12 +104,17 @@ CLI version.
   model size, not a measurement on your machine)
 - Optional flag: `--explain` prints why this model was recommended over
   alternatives (implemented in v0.1.0)
+- Interactive download offer: after the recommendation, pick the suggested
+  model or an alternative and Yachay runs `ollama pull` for you (skipped when
+  stdin is not a terminal, so scripts and pipes are unaffected)
 
 ### Out of scope (for now)
 - GUI or web interface
 - Model training or fine-tuning
 - Cloud model recommendations (local-only)
-- Auto-download or auto-install of models
+- Auto-download or auto-install of models ourselves — the CLI offers
+  `ollama pull` and inherits the terminal, so progress, resume and checksum
+  stay Ollama's job
 - Multi-user server mode
 
 ---
@@ -162,6 +167,21 @@ real hardware configurations, verified by external testers.
 
 **Exit criterion:** Chaka and quipu-ipfs can query Yachay programmatically,
 not just via CLI.
+
+---
+
+## Documentation
+
+The API docs are generated with **rustdoc** and published to
+[GitHub Pages](https://wiracocha-labs.github.io/yachay/):
+
+```bash
+cargo doc --no-deps -p yachay-core --open
+```
+
+`yachay-core` is the documented crate — the CLI is a thin presentation layer
+on top of it. Every public item carries a doc comment, enforced by
+`#![warn(missing_docs)]`.
 
 ---
 

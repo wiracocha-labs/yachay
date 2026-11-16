@@ -4,6 +4,10 @@
 //! Este crate es una librería pura — sin I/O de consola ni red — para que
 //! cualquier frontend (CLI, TUI, Tauri, o un nodo quipu consultándolo)
 //! consuma la misma lógica.
+//!
+//! Documentación renderizada: `cargo doc --no-deps -p yachay-core --open`.
+
+#![warn(missing_docs)]
 
 mod hardware;
 mod model;
