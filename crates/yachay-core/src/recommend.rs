@@ -112,12 +112,12 @@ pub fn recommend(hw: &HardwareProfile, task: Task) -> Recommendation {
     let (model, alternatives, reason) = match ranked.split_first() {
         Some(((_, best), rest)) => {
             let reason = format!(
-                "es el modelo más capaz para '{}' que cabe en tu RAM usable ({:.1} GB de {:.1} GB disponibles){}",
+                "the most capable model for '{}' that fits your RAM ({:.1} GB of {:.1} GB){}",
                 task,
                 best.ram_needed_gb,
                 hw.usable_ram_gb,
                 if best.primary_task() == Some(task) {
-                    " y está especializado en esta tarea"
+                    " and it's specialized for this task"
                 } else {
                     ""
                 }
@@ -129,7 +129,7 @@ pub fn recommend(hw: &HardwareProfile, task: Task) -> Recommendation {
             None,
             Vec::new(),
             format!(
-                "ningún modelo de la DB cabe en tu RAM usable ({:.1} GB) — hardware muy limitado",
+                "no model in the database fits your usable RAM ({:.1} GB) — limited hardware",
                 hw.usable_ram_gb
             ),
         ),

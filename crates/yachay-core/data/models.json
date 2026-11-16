@@ -5,7 +5,7 @@
     "params_b": 1.24,
     "ram_needed_gb": 2.5,
     "tasks": ["chat", "summarize"],
-    "notes": "El más liviano útil. Sorprendentemente decente para chat simple; ideal para hardware muy limitado."
+    "notes": "The lightest useful option. Surprisingly decent for simple chat; ideal for very limited hardware."
   },
   {
     "name": "Qwen2.5-Coder 1.5B",
@@ -13,7 +13,7 @@
     "params_b": 1.5,
     "ram_needed_gb": 2.8,
     "tasks": ["code"],
-    "notes": "Coder mínimo. Autocompletado rápido en hardware viejo; limitado para razonar refactors grandes."
+    "notes": "Minimal coder. Fast autocomplete on old hardware; limited for reasoning about large refactors."
   },
   {
     "name": "Gemma 2 2B",
@@ -21,7 +21,7 @@
     "params_b": 2.6,
     "ram_needed_gb": 3.2,
     "tasks": ["chat"],
-    "notes": "Buena calidad de texto por su tamaño. Alternativa a Llama 3.2 3B si va lento."
+    "notes": "Good text quality for its size. Use it when Llama 3.2 3B runs too slowly."
   },
   {
     "name": "Llama 3.2 3B",
@@ -29,7 +29,7 @@
     "params_b": 3.2,
     "ram_needed_gb": 4.0,
     "tasks": ["chat", "summarize", "rag"],
-    "notes": "El mejor 'generalista mínimo'. Punto de partida honesto para laptops de 8GB."
+    "notes": "The best 'minimal generalist'. An honest starting point for 8GB laptops."
   },
   {
     "name": "Qwen2.5-Coder 3B",
@@ -37,7 +37,7 @@
     "params_b": 3.1,
     "ram_needed_gb": 4.2,
     "tasks": ["code"],
-    "notes": "Coder pequeño muy capaz para su tamaño. Buen balance en laptops de 8GB."
+    "notes": "A small coder that punches above its size. Good balance on 8GB laptops."
   },
   {
     "name": "Phi-3 Mini 3.8B",
@@ -45,7 +45,7 @@
     "params_b": 3.8,
     "ram_needed_gb": 4.2,
     "tasks": ["chat", "code"],
-    "notes": "Razona mejor que la media en su tamaño. Útil si code va lento pero 7B no entra."
+    "notes": "Reasons better than average for its size. Useful when a 7B doesn't fit but you need code help."
   },
   {
     "name": "Gemma 3 4B",
@@ -53,7 +53,7 @@
     "params_b": 4.3,
     "ram_needed_gb": 4.8,
     "tasks": ["chat", "rag"],
-    "notes": "Contexto largo y multilingüe sólido. Buena base para RAG en hardware modesto."
+    "notes": "Long context and solid multilingual support. A good RAG base on modest hardware."
   },
   {
     "name": "Mistral 7B",
@@ -61,7 +61,7 @@
     "params_b": 7.2,
     "ram_needed_gb": 6.5,
     "tasks": ["chat", "rag", "summarize"],
-    "notes": "Clásico de los 7B: rápido y consistente. Buen generalista si no necesitas especialización."
+    "notes": "The 7B classic: fast and consistent. A good generalist when you need no specialization."
   },
   {
     "name": "Qwen2.5 7B",
@@ -69,7 +69,7 @@
     "params_b": 7.6,
     "ram_needed_gb": 6.8,
     "tasks": ["chat", "rag", "summarize"],
-    "notes": "Generalista fuerte, especialmente bueno siguiendo instrucciones y en español."
+    "notes": "Strong generalist, especially good at following instructions and in Spanish."
   },
   {
     "name": "Llama 3.1 8B",
@@ -77,7 +77,7 @@
     "params_b": 8.0,
     "ram_needed_gb": 7.0,
     "tasks": ["chat", "rag", "summarize"],
-    "notes": "Referencia de los 8B. Muy buen RAG y resumen; el default razonable con 16GB de RAM."
+    "notes": "The reference 8B. Very good at RAG and summarization; the sensible default with 16GB of RAM."
   },
   {
     "name": "Qwen2.5-Coder 7B",
@@ -85,7 +85,7 @@
     "params_b": 7.6,
     "ram_needed_gb": 6.8,
     "tasks": ["code"],
-    "notes": "El coder de referencia en tamaño local. Autocompletado, explicación y refactors reales."
+    "notes": "The reference local coder. Autocomplete, explanation and real refactors."
   },
   {
     "name": "DeepSeek-R1 Distill 7B",
@@ -93,7 +93,7 @@
     "params_b": 7.6,
     "ram_needed_gb": 6.8,
     "tasks": ["chat"],
-    "notes": "Razonamiento paso a paso (chain-of-thought) en tamaño local. Más lento pero más profundo."
+    "notes": "Step-by-step reasoning (chain-of-thought) at a local size. Slower, but deeper."
   },
   {
     "name": "Qwen2.5-Coder 14B",
@@ -101,7 +101,7 @@
     "params_b": 14.7,
     "ram_needed_gb": 11.5,
     "tasks": ["code"],
-    "notes": "Salto real de calidad en código si tienes 16GB+. El sweet spot calidad/tamaño para devs."
+    "notes": "A real quality jump for code with 16GB+. The quality/size sweet spot for developers."
   },
   {
     "name": "Qwen2.5-Coder 32B",
@@ -109,7 +109,7 @@
     "params_b": 32.8,
     "ram_needed_gb": 23.0,
     "tasks": ["code"],
-    "notes": "Calidad cercana a modelos cloud en código. Requiere 32GB+ de RAM para ir cómodo."
+    "notes": "Code quality close to cloud models. Needs 32GB+ of RAM to run comfortably."
   },
   {
     "name": "Llama 3.1 70B",
@@ -117,6 +117,6 @@
     "params_b": 70.6,
     "ram_needed_gb": 44.0,
     "tasks": ["chat", "rag"],
-    "notes": "Tope de gama local. Solo viable con 64GB+ de RAM o GPU seria — la mayoría no lo corre."
+    "notes": "The local ceiling. Only viable with 64GB+ of RAM or a serious GPU — most people can't run it."
   }
 ]

@@ -3,6 +3,8 @@
 //! `yachay` sin args abre un wizard interactivo.
 //! `yachay recommend --task code` da la recomendación directa.
 //! `--explain` muestra por qué ganó y por qué se descartaron las demás.
+//!
+//! La interfaz está en inglés; los comentarios de código, en español.
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
@@ -20,7 +22,7 @@ use yachay_core::{
 #[command(
     name = "yachay",
     version,
-    about = "Recomendador de modelos de IA locales según tu hardware y tu tarea"
+    about = "Find the best open-source local AI model for your hardware and task"
 )]
 struct Cli {
     /// Subcomando; sin él se abre el wizard interactivo.
@@ -31,23 +33,27 @@ struct Cli {
 /// Subcomandos disponibles.
 #[derive(Subcommand)]
 enum Commands {
-    /// Recomienda un modelo para una tarea.
+    /// Recommend a model for a task.
     Recommend {
-        /// Tarea: code, chat, summarize, rag.
+        /// Task: code, chat, summarize, rag.
         #[arg(short, long)]
         task: Option<String>,
-        /// Explica por qué ganó este modelo y por qué perdieron las demás.
+        /// Explain why this model won and why the others lost.
         #[arg(short, long)]
         explain: bool,
     },
-    /// Lista la base curada de modelos.
+    /// List the curated model database.
     Models,
+    /// Analyze your hardware and pick what to download.
+    Run,
+    /// List the models you already downloaded (delegates to `ollama list`).
+    Ls,
 }
 
 /// Punto de entrada: detecta hardware una sola vez y despacha el subcomando.
 ///
-/// Sin argumentos abre el wizard interactivo. Las tres ramas respetan la
-/// cancelación (Esc) saliendo con código 0 en vez de imprimir un error.
+/// Sin argumentos abre el wizard interactivo. Las ramas interactivas respetan
+/// la cancelación (Esc) saliendo con código 0 en vez de imprimir un error.
 fn main() -> Result<()> {
     let cli = Cli::parse();
 
@@ -61,11 +67,15 @@ fn main() -> Result<()> {
                     None => return Ok(()),
                 },
             };
+            print_hardware(&hw);
             run_recommend(&hw, task, explain);
         }
         Some(Commands::Models) => list_models(&hw),
-        None => {
-            // Sin args: wizard interactivo para no asustar a nadie.
+        Some(Commands::Ls) => list_local()?,
+        // `run` es el flujo interactivo; sin args se comporta igual.
+        None | Some(Commands::Run) => {
+            print_intro();
+            print_hardware(&hw);
             let Some(task) = ask_task()? else {
                 return Ok(());
             };
@@ -75,13 +85,28 @@ fn main() -> Result<()> {
     Ok(())
 }
 
+/// Explica, antes de preguntar, por qué la tarea cambia la recomendación.
+///
+/// Sin esto, la primera pantalla es una pregunta sin contexto: el usuario no
+/// sabe que "code" y "chat" llevan a bases de modelos distintas.
+fn print_intro() {
+    println!(
+        "{}",
+        style("yachay — find the right open-source model for your machine.").bold()
+    );
+    println!();
+    println!("  We ask what you'll use the model for, because the best choice");
+    println!("  depends on it: a code-specialized model beats a general one at");
+    println!("  programming, and the other way around for chat.");
+    println!();
+}
+
 /// Pregunta qué tarea hará el usuario.
 ///
 /// Devuelve `None` si cancela, para que quien llama decida salir sin ruido.
 fn ask_task() -> Result<Option<Task>> {
     let options: Vec<String> = Task::ALL.iter().map(|t| t.label().to_string()).collect();
-    let picked = match inquire::Select::new("¿Qué quieres hacer con el modelo?", options).prompt()
-    {
+    let picked = match inquire::Select::new("What will you use the model for?", options).prompt() {
         Ok(p) => p,
         Err(_) => return Ok(None),
     };
@@ -108,7 +133,6 @@ fn print_hardware(hw: &HardwareProfile) {
 /// Muestra la recomendación completa y, si la salida es una terminal
 /// interactiva, ofrece descargar el modelo o una alternativa.
 fn run_recommend(hw: &HardwareProfile, task: Task, explain: bool) {
-    print_hardware(hw);
     let rec = recommend(hw, task);
 
     let Some(model) = &rec.model else {
@@ -118,20 +142,20 @@ fn run_recommend(hw: &HardwareProfile, task: Task, explain: bool) {
 
     println!(
         "{} {}",
-        style("Recomendación:").bold(),
+        style("Recommendation:").bold(),
         style(&model.name).green().bold()
     );
     println!("  {} {}", style("→").dim(), rec.reason);
     if let Some(tps) = rec.estimated_tps {
         println!(
-            "  {} ~{:.0} tokens/seg estimados en tu hardware (aprox.)",
+            "  {} ~{:.0} tokens/sec estimated on your hardware (approximate)",
             style("→").dim(),
             tps
         );
     }
     println!("  {} {}", style("→").dim(), model.notes);
     println!();
-    println!("Para correrlo:");
+    println!("To run it:");
     println!(
         "  {}",
         style(format!("ollama run {}", model.ollama_tag))
@@ -141,7 +165,7 @@ fn run_recommend(hw: &HardwareProfile, task: Task, explain: bool) {
     println!();
 
     if !rec.alternatives.is_empty() {
-        println!("{}", style("Alternativas que también caben:").bold());
+        println!("{}", style("Alternatives that also fit:").bold());
         for alt in &rec.alternatives {
             println!(
                 "  · {} ({:.1}B — {:.1} GB RAM)",
@@ -164,19 +188,20 @@ fn run_recommend(hw: &HardwareProfile, task: Task, explain: bool) {
     }
 }
 
+/// Opción del selector que significa "no descargues nada".
+const CANCEL_OPTION: &str = "No, cancel";
+
 /// Pregunta si descargar el modelo elegido (o una alternativa) y delega
 /// la descarga a Ollama.
 ///
 /// No implementamos un downloader propio a propósito: `ollama pull` ya trae
 /// barra de progreso, reanudación y verificación de checksum.
 fn offer_download(rec: &Recommendation) -> Result<()> {
-    const CANCEL: &str = "No, solo el comando";
-
     let candidates = download_candidates(rec);
     let mut options: Vec<String> = candidates.iter().map(option_label).collect();
-    options.push(CANCEL.to_string());
+    options.push(CANCEL_OPTION.to_string());
 
-    let picked = match inquire::Select::new("¿Descargo alguno ahora?", options).prompt() {
+    let picked = match inquire::Select::new("Download one now?", options).prompt() {
         Ok(p) => p,
         Err(_) => return Ok(()), // Esc: cerrar sin ruido
     };
@@ -202,19 +227,120 @@ fn candidate_for<'a>(candidates: &'a [ModelSpec], picked: &str) -> Option<&'a Mo
 
 /// Texto de cada opción del selector, con el peso en RAM a la vista.
 fn option_label(model: &ModelSpec) -> String {
-    format!("{} ({:.1} GB de RAM)", model.name, model.ram_needed_gb)
+    format!("{} ({:.1} GB RAM)", model.name, model.ram_needed_gb)
+}
+
+/// Página oficial desde donde se instala Ollama en cualquier plataforma.
+const OLLAMA_URL: &str = "https://ollama.com/download";
+
+/// Instalador oficial: cubre Linux y macOS. Windows no lo tiene.
+const OLLAMA_INSTALL_CMD: &str = "curl -fsSL https://ollama.com/install.sh | sh";
+
+/// Lista los modelos ya descargados en esta máquina.
+///
+/// Delega en `ollama list` sin parsear la salida: es una tabla ya legible y
+/// parsearla se rompería con cualquier cambio de formato de Ollama.
+fn list_local() -> Result<()> {
+    if !ensure_ollama()? {
+        return Ok(());
+    }
+    let status = Command::new("ollama").arg("list").status()?;
+    if !status.success() {
+        anyhow::bail!("`ollama list` failed ({status})");
+    }
+    Ok(())
+}
+
+/// Asegura que `ollama` esté disponible. Si falta, avisa, muestra la página
+/// oficial y ofrece instalarlo sin salir de la terminal.
+///
+/// Devuelve `false` si el usuario prefiere instalarlo por su cuenta, para que
+/// quien llama termine con un mensaje útil en vez de un error.
+fn ensure_ollama() -> Result<bool> {
+    if ollama_available() {
+        return Ok(true);
+    }
+
+    println!();
+    println!(
+        "{} could not find `ollama` — it's needed to download models.",
+        style("✗").red()
+    );
+    println!("  Official page: {}", style(OLLAMA_URL).cyan());
+    println!();
+
+    // Windows no tiene script oficial: solo podemos guiar al instalador.
+    if cfg!(windows) {
+        println!("  Download `OllamaSetup.exe` from that page, then run yachay again.");
+        return Ok(false);
+    }
+
+    let install = inquire::Confirm::new("Install Ollama now to continue?")
+        .with_default(false)
+        .prompt()
+        .unwrap_or(false);
+    if !install {
+        return Ok(false);
+    }
+
+    // Mostramos el comando exacto antes de ejecutarlo: el usuario debe poder
+    // auditarlo. No hay input del usuario en la cadena, así que no hay inyección.
+    println!();
+    println!("  {}", style(OLLAMA_INSTALL_CMD).dim());
+    if cfg!(target_os = "linux") {
+        // En Linux el script instala en /usr/local/bin, crea el usuario
+        // `ollama` y registra un servicio systemd: todo eso requiere root.
+        println!(
+            "  {}",
+            style("On Linux this uses `sudo` and may ask for your password.").dim()
+        );
+    }
+    println!();
+    let status = Command::new("sh")
+        .args(["-c", OLLAMA_INSTALL_CMD])
+        .status()?;
+    if !status.success() {
+        anyhow::bail!(
+            "Ollama installation did not finish ({status}) — you can run it yourself:\n  {}",
+            OLLAMA_INSTALL_CMD
+        );
+    }
+
+    // En macOS el instalador abre la app en segundo plano, así que el daemon
+    // puede tardar unos segundos en responder.
+    if !wait_for_daemon() {
+        anyhow::bail!("Ollama installed but is not responding — open it and try again");
+    }
+    println!("{} Ollama ready.", style("✓").green());
+    Ok(true)
+}
+
+/// Espera hasta 5 segundos a que el daemon de Ollama conteste.
+fn wait_for_daemon() -> bool {
+    for _ in 0..20 {
+        let up = Command::new("ollama")
+            .arg("list")
+            .output()
+            .map(|o| o.status.success())
+            .unwrap_or(false);
+        if up {
+            return true;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(250));
+    }
+    false
 }
 
 /// Corre `ollama pull <tag>` heredando la terminal para que el usuario vea
 /// el progreso real de la descarga.
 fn pull(model: &ModelSpec) -> Result<()> {
-    if !ollama_available() {
+    if !ensure_ollama()? {
         println!();
+        println!("Once you have Ollama, run:");
         println!(
-            "{} no encontré `ollama` en tu PATH — no puedo descargar.",
-            style("✗").red()
+            "  {}",
+            style(format!("ollama pull {}", model.ollama_tag)).cyan()
         );
-        println!("  Instálalo desde https://ollama.com/download y vuelve a correr yachay.");
         return Ok(());
     }
 
@@ -225,8 +351,8 @@ fn pull(model: &ModelSpec) -> Result<()> {
 
     if status.success() {
         println!();
-        println!("{} {} descargado.", style("✓").green(), model.name);
-        println!("Puedes usarlo con:");
+        println!("{} {} downloaded.", style("✓").green(), model.name);
+        println!("Run it with:");
         println!(
             "  {}",
             style(format!("ollama run {}", model.ollama_tag))
@@ -235,7 +361,7 @@ fn pull(model: &ModelSpec) -> Result<()> {
         );
     } else {
         anyhow::bail!(
-            "`ollama pull {}` falló ({}) — revisa el mensaje de arriba",
+            "`ollama pull {}` failed ({}) — see the message above",
             model.ollama_tag,
             status
         );
@@ -243,23 +369,30 @@ fn pull(model: &ModelSpec) -> Result<()> {
     Ok(())
 }
 
-/// ¿Hay un binario de Ollama ejecutable en el PATH?
+/// ¿Hay un binario de Ollama que responde?
+///
+/// No basta con que exista: un `ollama` roto también está en el PATH y
+/// entonces conviene ofrecer la reinstalación.
 fn ollama_available() -> bool {
-    Command::new("ollama").arg("--version").output().is_ok()
+    Command::new("ollama")
+        .arg("--version")
+        .output()
+        .map(|o| o.status.success())
+        .unwrap_or(false)
 }
 
 /// Explica, modelo por modelo, por qué cabe o no cabe en esta máquina.
 fn print_explain(hw: &HardwareProfile, task: Task, verdicts: &[(ModelSpec, CandidateVerdict)]) {
-    println!("{}", style("¿Por qué este modelo?").bold());
+    println!("{}", style("Why this model?").bold());
     println!(
-        "  RAM usable: {:.1} GB (de {:.0} GB totales, dejando espacio al SO)\n",
+        "  Usable RAM: {:.1} GB (out of {:.0} GB total, leaving room for the OS)\n",
         hw.usable_ram_gb, hw.total_ram_gb
     );
     for (model, verdict) in verdicts {
         match verdict {
             CandidateVerdict::Fits { .. } if model.supports(task) => {
                 println!(
-                    "  {} {} — cabe ({:.1} GB) y sirve para {}",
+                    "  {} {} — fits ({:.1} GB) and is built for {}",
                     style("✓").green(),
                     model.name,
                     model.ram_needed_gb,
@@ -268,7 +401,7 @@ fn print_explain(hw: &HardwareProfile, task: Task, verdicts: &[(ModelSpec, Candi
             }
             CandidateVerdict::FitsOtherTask => {
                 println!(
-                    "  {} {} — cabe pero no está hecho para {}",
+                    "  {} {} — fits, but isn't made for {}",
                     style("·").dim(),
                     style(&model.name).dim(),
                     task
@@ -276,7 +409,7 @@ fn print_explain(hw: &HardwareProfile, task: Task, verdicts: &[(ModelSpec, Candi
             }
             CandidateVerdict::TooBig { deficit_gb } => {
                 println!(
-                    "  {} {} — necesita {:.1} GB más de los que puedes ofrecer",
+                    "  {} {} — needs {:.1} GB more than you can offer",
                     style("✗").red(),
                     style(&model.name).dim(),
                     deficit_gb
@@ -290,7 +423,7 @@ fn print_explain(hw: &HardwareProfile, task: Task, verdicts: &[(ModelSpec, Candi
 /// Tabla completa de la DB con ✓/✗ según si cada modelo cabe en la máquina.
 fn list_models(hw: &HardwareProfile) {
     print_hardware(hw);
-    println!("{}", style("Base curada de modelos:").bold());
+    println!("{}", style("Curated model database:").bold());
     for m in models() {
         let fits = if m.ram_needed_gb <= hw.usable_ram_gb {
             style("✓").green()
@@ -349,6 +482,6 @@ mod tests {
     fn candidate_for_returns_none_on_cancel() {
         let rec = rec(model("A", "a:7b"), Vec::new());
         let candidates = download_candidates(&rec);
-        assert!(candidate_for(&candidates, "No, solo el comando").is_none());
+        assert!(candidate_for(&candidates, CANCEL_OPTION).is_none());
     }
 }

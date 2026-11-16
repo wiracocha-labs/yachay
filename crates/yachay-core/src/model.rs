@@ -29,10 +29,10 @@ impl Task {
     /// Nombre para mostrar en la UI.
     pub fn label(&self) -> &'static str {
         match self {
-            Task::Code => "código",
-            Task::Chat => "chat / asistente",
-            Task::Summarize => "resumir documentos",
-            Task::Rag => "RAG sobre documentos propios",
+            Task::Code => "code",
+            Task::Chat => "chat / assistant",
+            Task::Summarize => "summarize documents",
+            Task::Rag => "RAG over your own documents",
         }
     }
 }
@@ -57,7 +57,7 @@ impl FromStr for Task {
             "summarize" | "resumen" => Ok(Task::Summarize),
             "rag" => Ok(Task::Rag),
             other => Err(format!(
-                "tarea desconocida '{other}' — opciones: code, chat, summarize, rag"
+                "unknown task '{other}' — options: code, chat, summarize, rag"
             )),
         }
     }

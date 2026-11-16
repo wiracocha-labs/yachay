@@ -39,11 +39,17 @@ yachay recommend --task code
 # Con explicación de por qué ganó y qué se descartó
 yachay recommend --task code --explain
 
-# Wizard interactivo (sin args)
+# Flujo interactivo: analiza tu hardware, recomienda y ofrece descargar
+yachay run
+
+# Lo mismo, sin escribir el subcomando
 yachay
 
 # Ver la base curada y qué cabe en tu hardware
 yachay models
+
+# Ver qué modelos ya tienes descargados
+yachay ls
 ```
 
 To build from source instead:
@@ -107,6 +113,11 @@ CLI version.
 - Interactive download offer: after the recommendation, pick the suggested
   model or an alternative and Yachay runs `ollama pull` for you (skipped when
   stdin is not a terminal, so scripts and pipes are unaffected)
+- If Ollama itself is missing, Yachay asks first and, on Linux/macOS, offers to
+  run the official installer (`https://ollama.com/install.sh`) without leaving
+  the terminal. On Linux that installer needs `sudo` (it registers a systemd
+  service), and Yachay warns before running it. Windows has no official script,
+  so it only points to the page
 
 ### Out of scope (for now)
 - GUI or web interface
