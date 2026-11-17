@@ -6,7 +6,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 license = "AGPL-3.0-only"
 authors = ["Wiracocha Labs"]
@@ -32,3 +32,13 @@ targets = [
 ]
 pr-run-mode = "skip"
 install-path = "CARGO_HOME"
+# Mensaje que imprimen los instaladores (shell y powershell) al terminar.
+# Sin `$`, backticks ni comillas dobles: se escribe dentro del script.
+install-success-msg = """
+yachay installed. Next commands:
+
+  yachay run      pick a model and download it
+  yachay models   the curated catalog
+  yachay ls       models already on this machine
+  yachay --help   all commands and flags
+"""
