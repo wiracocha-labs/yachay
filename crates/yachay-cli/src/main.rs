@@ -17,6 +17,8 @@ use yachay_core::{
     Recommendation, Task,
 };
 
+mod update;
+
 /// Argumentos de línea de comandos.
 #[derive(Parser)]
 #[command(
@@ -28,6 +30,10 @@ struct Cli {
     /// Subcomando; sin él se abre el wizard interactivo.
     #[command(subcommand)]
     command: Option<Commands>,
+
+    /// Skip the once-a-day check for a newer release.
+    #[arg(long, global = true)]
+    no_update_check: bool,
 }
 
 /// Subcomandos disponibles.
@@ -56,6 +62,11 @@ enum Commands {
 /// la cancelación (Esc) saliendo con código 0 en vez de imprimir un error.
 fn main() -> Result<()> {
     let cli = Cli::parse();
+
+    // Antes del hardware: el aviso debe verse aunque el comando falle después.
+    if !cli.no_update_check {
+        update::notify();
+    }
 
     let hw = detect_hardware();
     match cli.command {

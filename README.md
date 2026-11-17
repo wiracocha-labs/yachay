@@ -192,6 +192,13 @@ cargo doc --no-deps -p yachay-core --open
 
 Every public item carries a doc comment, enforced by `#![warn(missing_docs)]`.
 
+## Update check
+
+`yachay` makes at most one anonymous request per day to the GitHub releases
+API, to print a single line when a newer version exists. Nothing else is sent —
+no hardware, no identifiers. Disable it with `--no-update-check` or
+`YACHAY_NO_UPDATE_CHECK=1`.
+
 ---
 
 ## Relation to other Wiracocha Labs projects
