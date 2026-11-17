@@ -5,7 +5,7 @@
 A local AI model recommender built in Rust, part of
 [Wiracocha Labs](https://github.com/wiracocha-labs).
 
-**Status:** Phase 1 — MVP CLI `Released` · [v0.2.0](https://github.com/wiracocha-labs/yachay/releases/tag/v0.2.0)
+**Status:** Phase 1 — MVP CLI `Released` · [v0.3.0](https://github.com/wiracocha-labs/yachay/releases/tag/v0.3.0)
 
 ---
 
