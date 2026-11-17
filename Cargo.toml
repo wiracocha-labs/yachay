@@ -42,3 +42,8 @@ yachay installed. Next commands:
   yachay ls       models already on this machine
   yachay --help   all commands and flags
 """
+
+# `macos-14` fue retirado por GitHub el 2026-11-02 y dist 0.33 lo sigue
+# emitiendo por defecto para arm64: el job muere sin runner y cancela el run.
+[workspace.metadata.dist.github-custom-runners]
+aarch64-apple-darwin = "macos-15"

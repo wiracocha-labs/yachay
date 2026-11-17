@@ -183,16 +183,14 @@ not just via CLI.
 
 ## Documentation
 
-The API docs are generated with **rustdoc** and published to
-[GitHub Pages](https://wiracocha-labs.github.io/yachay/):
+The CLI is documented by `yachay --help` and the Quickstart above.
+The `yachay-core` API is documented in the source and rendered locally:
 
 ```bash
 cargo doc --no-deps -p yachay-core --open
 ```
 
-`yachay-core` is the documented crate — the CLI is a thin presentation layer
-on top of it. Every public item carries a doc comment, enforced by
-`#![warn(missing_docs)]`.
+Every public item carries a doc comment, enforced by `#![warn(missing_docs)]`.
 
 ---
 
