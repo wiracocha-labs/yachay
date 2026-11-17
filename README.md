@@ -30,6 +30,21 @@ powershell -ExecutionPolicy Bypass -c "irm https://github.com/wiracocha-labs/yac
 
 Or download the archive for your platform directly from the release page.
 
+## Platform status
+
+Honest state of the published binaries — verified or not, not an ambition:
+
+| platform | status |
+|---|---|
+| macOS Apple Silicon | verified — installs and runs |
+| macOS Intel · Linux x86_64 · Linux arm64 | built and published, **not run yet** — please report |
+| Windows x64 | built and published, **not run yet** · the `.exe` is unsigned, so expect SmartScreen: *More info → Run anyway* |
+| Linux with glibc < 2.34 (Debian 11, Ubuntu 20.04, RHEL 8) | not supported — the binary needs glibc 2.34+ |
+| Alpine / musl | not supported — there is no musl build |
+
+Running it on an untested platform is useful: report the OS, `yachay --version`, and
+the command you ran.
+
 ## Quickstart
 
 ```bash
